@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace My.Data.Repository
 {
+    /// <summary>
+    /// I just dont want to use generic here because has a heavy reliance on Linq.
+    /// </summary>
     public class MyDbRepository:IDisposable,IAccountRepository,ILoanRepository,IPaymentRepository
     {
         private readonly MyDbContext _context;
@@ -17,6 +20,7 @@ namespace My.Data.Repository
         #region Account CRUD
         public async Task<int> DeleteAccountAsync(int id)
         {
+            // Delete or transfer to archive table or add deleted flag.
             _context.Accounts.Remove(await _context.Accounts.FirstOrDefaultAsync(x => x.Id == id));
             return await _context.SaveChangesAsync();
         }
@@ -46,6 +50,7 @@ namespace My.Data.Repository
         #region Loan CRUD
         public async Task<IEnumerable<Loan>> GetLoansAsync(int accountId)
         {
+            // You can execute raw query here or just simply LINQ depends on situation
             return await (from loan in _context.Loans
                           orderby loan.Date
                           select new Loan
@@ -91,6 +96,7 @@ namespace My.Data.Repository
 
         public async Task<int> DeleteLoanAsync(int id)
         {
+            // Delete or transfer to archive table or add deleted flag.
             _context.Loans.Remove(await _context.Loans.FirstOrDefaultAsync(x => x.Id == id));
             return await _context.SaveChangesAsync();
         }
@@ -121,6 +127,7 @@ namespace My.Data.Repository
 
         public async Task<int> DeletePaymentAsync(int id)
         {
+            // Delete or transfer to archive table or add deleted flag.
             _context.Payments.Remove(await _context.Payments.FirstOrDefaultAsync(x => x.Id == id));
             return await _context.SaveChangesAsync();
         }

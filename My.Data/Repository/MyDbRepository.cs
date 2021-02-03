@@ -57,7 +57,7 @@ namespace My.Data.Repository
                               Balance = loan.Amount - _context.Payments.Where(x => x.LoanId == loan.Id).Sum(x => x.Amount), // Calculate Balance
                               IsClosed = loan.IsClosed,
                               Status = loan.Status,
-                              Payments = _context.Payments.Where(x => x.LoanId == loan.Id).ToList().OrderBy(x=>x.Date) // List Payments
+                              Payments = _context.Payments.Where(x => x.LoanId == loan.Id).OrderBy(x => x.Date).ToList() // List Payments
                           }).ToListAsync();
         }
 

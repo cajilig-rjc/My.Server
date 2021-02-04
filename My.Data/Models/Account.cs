@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace My.Data.Models
+﻿namespace My.Data.Models
 {
     public class Account
     {

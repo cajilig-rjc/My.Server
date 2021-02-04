@@ -1,16 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using My.Data.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace My.Data.Repository
 {
-    /// <summary>
-    /// I just dont want to use generic here because has a heavy reliance on Linq.
-    /// </summary>
-    public class MyDbRepository:IDisposable,IAccountRepository,ILoanRepository,IPaymentRepository,IUserRepository
+    public class MyDbRepository:IAccountRepository,ILoanRepository,IPaymentRepository,IUserRepository
     {
         private readonly MyDbContext _context;
         public MyDbRepository(MyDbContext context)
@@ -37,7 +33,7 @@ namespace My.Data.Repository
 
         public async Task<int> AddAccountAsync(Account account)
         {
-            _context.Accounts.Add(account);
+            await _context.Accounts.AddAsync(account);
             return await _context.SaveChangesAsync();
         }
 
@@ -50,41 +46,44 @@ namespace My.Data.Repository
         #region Loan CRUD
         public async Task<IEnumerable<Loan>> GetLoansAsync(int accountId)
         {
+            var loans =await _context.Loans.ToListAsync();
+            var payments = await _context.Payments.ToListAsync();
             // You can execute raw query here or just simply LINQ depends on situation
-            return await (from loan in _context.Loans
-                          orderby loan.Date
+            return  (from loan in loans
                           select new Loan
                           {
                               Id = loan.Id,
                               AccountId = loan.AccountId,
                               Date = loan.Date,
                               Amount = loan.Amount,
-                              Balance = loan.Amount - _context.Payments.Where(x => x.LoanId == loan.Id).Sum(x => x.Amount), // Calculate Balance
+                              Balance = loan.Amount - payments.Where(x => x.LoanId == loan.Id).Sum(x => x.Amount), // Calculate Balance
                               IsClosed = loan.IsClosed,
                               Status = loan.Status,
-                              Payments = _context.Payments.Where(x => x.LoanId == loan.Id).OrderBy(x => x.Date).ToList() // List Payments
-                          }).ToListAsync();
+                              Payments = payments.Where(x => x.LoanId == loan.Id).OrderByDescending(x => x.Date).ToList() // List Payments
+                          }).Where(x=>x.AccountId == accountId).ToList();
         }
 
         public async Task<Loan> GetLoanAsync(int id)
         {
-            return await (from loan in _context.Loans
-                          select new Loan
-                          {
-                              Id = loan.Id,
-                              AccountId = loan.AccountId,
-                              Date = loan.Date,
-                              Amount = loan.Amount,
-                              Balance = loan.Amount - _context.Payments.Where(x => x.LoanId == loan.Id).Sum(x => x.Amount),
-                              IsClosed = loan.IsClosed,
-                              Status = loan.Status,
-                              Payments = _context.Payments.Where(x => x.LoanId == loan.Id).OrderBy(x=>x.Date).ToList()
-                          }).FirstOrDefaultAsync(x => x.Id == id);
+            var loans = await _context.Loans.Where(x=>x.Id == id).ToListAsync();
+            var payments = await _context.Payments.Where(x=>x.LoanId == id).ToListAsync();
+            return (from loan in _context.Loans
+                    select new Loan
+                    {
+                        Id = loan.Id,
+                        AccountId = loan.AccountId,
+                        Date = loan.Date,
+                        Amount = loan.Amount,
+                        Balance = loan.Amount - payments.Where(x => x.LoanId == loan.Id).Sum(x => x.Amount), // Calculate Balance
+                        IsClosed = loan.IsClosed,
+                        Status = loan.Status,
+                        Payments = payments.Where(x => x.LoanId == loan.Id).OrderByDescending(x => x.Date).ToList() // List Payments
+                    }).FirstOrDefault(x => x.Id == id);
         }
 
         public async Task<int> AddLoanAsync(Loan loan)
         {
-            _context.Loans.Add(loan);
+           await _context.Loans.AddAsync(loan);
             return await _context.SaveChangesAsync();
         }
 
@@ -105,7 +104,7 @@ namespace My.Data.Repository
         #region Payment CRUD
         public async Task<IEnumerable<Payment>> GetPaymentsAsync(int loanId)
         {
-            return await _context.Payments.Where(x => x.LoanId == loanId).OrderBy(x=>x.Date).ToListAsync();
+            return await _context.Payments.Where(x => x.LoanId == loanId).OrderByDescending(x=>x.Date).ToListAsync();
         }
 
         public async Task<Payment> GetPaymentAsync(int id)
@@ -115,7 +114,7 @@ namespace My.Data.Repository
 
         public async Task<int> AddPaymentAsync(Payment payment)
         {
-            _context.Payments.Add(payment);
+            await _context.Payments.AddAsync(payment);
             return await _context.SaveChangesAsync();
         }
 
@@ -131,17 +130,11 @@ namespace My.Data.Repository
             _context.Payments.Remove(await _context.Payments.FirstOrDefaultAsync(x => x.Id == id));
             return await _context.SaveChangesAsync();
         }
-        #endregion
-
-        public void Dispose()
-        {
-            _context.Dispose();
-        }
-
+        #endregion      
         //User
         public async Task<User> GetUserAsync(string userName, string password)
         {
-           return await _context.Users.SingleOrDefaultAsync(x => x.UserName == userName && x.Password == password);
+           return await _context.Users.SingleOrDefaultAsync(x => x.UserName.ToLower() == userName.ToLower() && x.Password == password);
         }
     }
 }

@@ -1,5 +1,17 @@
 ### My.Server
 
+###### Technology Used
+- .Net 5
+- Asp.Net Core Web Api (MVC)
+- Entity Framework Core 
+- SQL Server 2019
+- NUnit
+- FluentAssertions
+
+###### Pattern
+- MVC
+- Repository
+
 ###### Database Migration
 **Power Shell**
 - Navigate to My.Server path project

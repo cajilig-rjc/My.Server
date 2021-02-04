@@ -63,7 +63,7 @@ namespace My.Server.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
-        [HttpPost("update")]
+        [HttpPut("update")]
         public async Task<IActionResult> UpdatePaymentAsync([FromBody] Payment payment)
         {
             try

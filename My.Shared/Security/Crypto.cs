@@ -8,12 +8,13 @@ namespace My.Shared.Security
     {
         public static string Decrypt(string textToDecrypt, string key)
         {
-            RijndaelManaged rijndaelCipher = new RijndaelManaged();
-            rijndaelCipher.Mode = CipherMode.CBC;
-            rijndaelCipher.Padding = PaddingMode.PKCS7;
-
-            rijndaelCipher.KeySize = 0x80;
-            rijndaelCipher.BlockSize = 0x80;
+            RijndaelManaged rijndaelCipher = new RijndaelManaged
+            {
+                KeySize = 0x80,
+                BlockSize = 0x80,
+                Mode = CipherMode.CBC,
+                Padding = PaddingMode.PKCS7
+            };          
             byte[] encryptedData = Convert.FromBase64String(textToDecrypt);
             byte[] pwdBytes = Encoding.UTF8.GetBytes(key);
             byte[] keyBytes = new byte[0x10];
@@ -31,12 +32,13 @@ namespace My.Shared.Security
 
         public static string Encrypt(string textToEncrypt, string key)
         {
-            RijndaelManaged rijndaelCipher = new RijndaelManaged();
-            rijndaelCipher.Mode = CipherMode.CBC;
-            rijndaelCipher.Padding = PaddingMode.PKCS7;
-
-            rijndaelCipher.KeySize = 0x80;
-            rijndaelCipher.BlockSize = 0x80;
+            RijndaelManaged rijndaelCipher = new RijndaelManaged
+            {
+                KeySize = 0x80,
+                BlockSize = 0x80,
+                Mode = CipherMode.CBC,
+                Padding = PaddingMode.PKCS7
+            };
             byte[] pwdBytes = Encoding.UTF8.GetBytes(key);
             byte[] keyBytes = new byte[0x10];
             int len = pwdBytes.Length;

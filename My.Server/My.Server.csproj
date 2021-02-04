@@ -19,4 +19,13 @@
     <ProjectReference Include="..\My.Data\My.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="appsettings - Copy.QA.Development.json">
+      <DependentUpon>appsettings.QA.Development.json</DependentUpon>
+    </Content>
+    <Content Update="appsettings - Copy.QA.json">
+      <DependentUpon>appsettings.QA.json</DependentUpon>
+    </Content>
+  </ItemGroup>
+
 </Project>

@@ -1,11 +1,13 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using My.Data;
 using My.Data.Enums;
 using My.Data.Models;
 using My.Data.Repository;
 using NUnit.Framework;
 using System;
+using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,12 +16,15 @@ namespace My.NUnitTest
     public class RepositoryUnitTest
     {       
         private DbContextOptions<MyDbContext> _options;
+        private IConfiguration _configuration;
         [SetUp]
         public void Setup()
-        {
+        {           
             _options = new DbContextOptionsBuilder<MyDbContext>()
             .UseInMemoryDatabase(databaseName: "MyDb")
-            .Options;          
+            .Options;           
+            _configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
+         
             SeedData();
            
         }
@@ -27,7 +32,7 @@ namespace My.NUnitTest
         //Add Sample Data
         public async void SeedData()
         {
-            using var repo = new MyDbRepository(new MyDbContext(_options));
+            using var repo = new MyDbRepository(new MyDbContext(_options,_configuration));
             await repo.AddAccountAsync(new Account
             {
                 Id = 1,
@@ -57,7 +62,7 @@ namespace My.NUnitTest
         [Test]
         public async Task GetAccount()
         {
-            using var repo = new MyDbRepository(new MyDbContext(_options));
+            using var repo = new MyDbRepository(new MyDbContext(_options,_configuration));
             var account = await repo.GetAccountAsync(1);
             account.Should().NotBeNull();
 
@@ -65,7 +70,7 @@ namespace My.NUnitTest
         [Test]
         public async Task GetAccounts()
         {
-            using var repo = new MyDbRepository(new MyDbContext(_options));
+            using var repo = new MyDbRepository(new MyDbContext(_options,_configuration));
             var accounts = await repo.GetAccountsAsync();
             accounts.Should().NotBeNull();
             accounts.Count().Should().BeGreaterThan(0);
@@ -74,7 +79,7 @@ namespace My.NUnitTest
         [Test]
         public async Task InsertAccount()
         {
-            using var repo = new MyDbRepository(new MyDbContext(_options));
+            using var repo = new MyDbRepository(new MyDbContext(_options,_configuration));
             int i = await repo.AddAccountAsync(new Account { 
             Id = 0,
             Name = "Test Acount2"
@@ -85,7 +90,7 @@ namespace My.NUnitTest
         [Test]
         public async Task UpdateAccount()
         {
-            using var repo = new MyDbRepository(new MyDbContext(_options));
+            using var repo = new MyDbRepository(new MyDbContext(_options,_configuration));
             int i = await repo.UpdateAccountAsync(new Account
             {
                 Id = 1,
@@ -98,7 +103,7 @@ namespace My.NUnitTest
         [Test]
         public async Task DeleteAccount()
         {
-            using var repo = new MyDbRepository(new MyDbContext(_options));
+            using var repo = new MyDbRepository(new MyDbContext(_options,_configuration));
             int i = await repo.DeleteAccountAsync(1);
             i.Should().BeGreaterThan(0);
         }
@@ -107,14 +112,14 @@ namespace My.NUnitTest
         [Test]
         public async Task GetLoan()
         {
-            using var repo = new MyDbRepository(new MyDbContext(_options));
+            using var repo = new MyDbRepository(new MyDbContext(_options,_configuration));
             var loan = await repo.GetLoanAsync(1);
             loan.Should().NotBeNull();
         }
         [Test]
         public async Task GetLoans()
         {
-            using var repo = new MyDbRepository(new MyDbContext(_options));
+            using var repo = new MyDbRepository(new MyDbContext(_options,_configuration));
             var loans = await repo.GetLoansAsync(1);
 
             loans.Count().Should().BeGreaterThan(0);
@@ -123,7 +128,7 @@ namespace My.NUnitTest
         [Test]
         public async Task InsertLoan()
         {
-            using var repo = new MyDbRepository(new MyDbContext(_options));
+            using var repo = new MyDbRepository(new MyDbContext(_options,_configuration));
             int i = await repo.AddLoanAsync(new Loan
             {
                 Id = 0,
@@ -139,7 +144,7 @@ namespace My.NUnitTest
         [Test]
         public async Task UpdateLoan()
         {
-            using var repo = new MyDbRepository(new MyDbContext(_options));
+            using var repo = new MyDbRepository(new MyDbContext(_options,_configuration));
             int i = await repo.UpdateLoanAsync(new Loan
             {
                 Id = 1,
@@ -156,7 +161,7 @@ namespace My.NUnitTest
         [Test]
         public async Task DeleteLoan()
         {
-            using var repo = new MyDbRepository(new MyDbContext(_options));
+            using var repo = new MyDbRepository(new MyDbContext(_options,_configuration));
             int i = await repo.DeleteLoanAsync(1);
             i.Should().BeGreaterThan(0);
         }
@@ -165,14 +170,14 @@ namespace My.NUnitTest
         [Test]
         public async Task GetPayment()
         {
-            using var repo = new MyDbRepository(new MyDbContext(_options));
+            using var repo = new MyDbRepository(new MyDbContext(_options,_configuration));
             var payment = await repo.GetPaymentAsync(1);
             payment.Should().NotBeNull();
         }
         [Test]
         public async Task GetPayments()
         {
-            using var repo = new MyDbRepository(new MyDbContext(_options));
+            using var repo = new MyDbRepository(new MyDbContext(_options,_configuration));
             var payments = await repo.GetPaymentsAsync(1);
 
             payments.Count().Should().BeGreaterThan(0);
@@ -181,7 +186,7 @@ namespace My.NUnitTest
         [Test]
         public async Task InsertPayment()
         {
-            using var repo = new MyDbRepository(new MyDbContext(_options));
+            using var repo = new MyDbRepository(new MyDbContext(_options,_configuration));
             int i = await repo.AddPaymentAsync(new Payment
             {
                 Id = 0,
@@ -194,7 +199,7 @@ namespace My.NUnitTest
         [Test]
         public async Task UpdatePayment()
         {
-            using var repo = new MyDbRepository(new MyDbContext(_options));
+            using var repo = new MyDbRepository(new MyDbContext(_options,_configuration));
             int i = await repo.UpdatePaymentAsync(new Payment
             {
                 Id = 1,
@@ -208,7 +213,7 @@ namespace My.NUnitTest
         [Test]
         public async Task DeletePayment()
         {
-            using var repo = new MyDbRepository(new MyDbContext(_options));
+            using var repo = new MyDbRepository(new MyDbContext(_options,_configuration));
             int i = await repo.DeletePaymentAsync(1);
             i.Should().BeGreaterThan(0);
         }

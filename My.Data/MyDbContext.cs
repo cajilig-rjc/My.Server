@@ -1,22 +1,43 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using My.Data.Enums;
 using My.Data.Models;
+using My.Shared.Security;
 using System;
 
 namespace My.Data
 {
     public class MyDbContext : DbContext
     {
-        public MyDbContext(DbContextOptions<MyDbContext> options):base(options) {
+        private readonly IConfiguration _configuration;
+        public MyDbContext(DbContextOptions<MyDbContext> options, IConfiguration configuration) :base(options) {
+            _configuration = configuration;
         }
 
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Loan> Loans { get; set; }
         public DbSet<Payment> Payments { get; set; }
-
+        public DbSet<User> Users { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+            builder.Entity<User>(entity =>
+            {
+                //Key
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.Id).ValueGeneratedOnAdd();
+                //Property
+                entity.Property(x => x.UserName).HasMaxLength(50);
+                entity.HasIndex(x => x.UserName).IsUnique();
+                //Default Data
+                entity.HasData(new User
+                {
+                    Id = 1,
+                    UserName = "ronjun.cajilig",
+                    Password = Crypto.Encrypt("",_configuration["Crypto:Key"])
+                });
+
+            });
             builder.Entity<Account>(entity =>
             {
                 //Key

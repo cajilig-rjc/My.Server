@@ -10,7 +10,7 @@ namespace My.Data.Repository
     /// <summary>
     /// I just dont want to use generic here because has a heavy reliance on Linq.
     /// </summary>
-    public class MyDbRepository:IDisposable,IAccountRepository,ILoanRepository,IPaymentRepository
+    public class MyDbRepository:IDisposable,IAccountRepository,ILoanRepository,IPaymentRepository,IUserRepository
     {
         private readonly MyDbContext _context;
         public MyDbRepository(MyDbContext context)
@@ -136,6 +136,12 @@ namespace My.Data.Repository
         public void Dispose()
         {
             _context.Dispose();
+        }
+
+        //User
+        public async Task<User> GetUserAsync(string userName, string password)
+        {
+           return await _context.Users.SingleOrDefaultAsync(x => x.UserName == userName && x.Password == password);
         }
     }
 }

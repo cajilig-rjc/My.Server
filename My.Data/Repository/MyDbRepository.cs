@@ -67,7 +67,7 @@ namespace My.Data.Repository
         {
             var loans = await _context.Loans.Where(x=>x.Id == id).ToListAsync();
             var payments = await _context.Payments.Where(x=>x.LoanId == id).ToListAsync();
-            return (from loan in _context.Loans
+            return (from loan in loans
                     select new Loan
                     {
                         Id = loan.Id,

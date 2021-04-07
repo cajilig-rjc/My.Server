@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using My.Data.Models;
-using My.Data.Repository;
 using My.Data.Repository.Intefaces;
 using System.Threading.Tasks;
 
@@ -10,7 +9,7 @@ namespace My.Server.Controllers
     public class LoansController : BaseController
     {
         private readonly IMyDbRepository _repo;
-        public LoansController(MyDbRepository repository)
+        public LoansController(IMyDbRepository repository)
         {         
             _repo = repository;
         }

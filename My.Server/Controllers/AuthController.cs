@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using My.Data.Models;
-using My.Data.Repository;
+using My.Data.Repository.Intefaces;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -13,18 +12,14 @@ using System.Threading.Tasks;
 
 namespace My.Server.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController: BaseController
     {
         private readonly IConfiguration _configuration;
-        private readonly ILogger _logger;
-        private readonly IUserRepository _user;
-        public AuthController(IConfiguration configuration, ILogger<AuthController> logger, MyDbRepository repository)
+        private readonly IMyDbRepository _repo;
+        public AuthController(IConfiguration configuration, IMyDbRepository repo)
         {
             _configuration = configuration;
-            _logger = logger;
-            _user = repository;         
+            _repo = repo;         
         }
         private string GenerateToken(User user)
         {
@@ -47,20 +42,10 @@ namespace My.Server.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync([FromForm] string username, [FromForm] string password)
         {
-            try
-            {
-                var user = await _user.GetUserAsync(username, password);
-                if (user != null)
-                    return StatusCode(StatusCodes.Status200OK, GenerateToken(user));//return token
-                return StatusCode(StatusCodes.Status204NoContent);
-
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                _logger.LogError(ex.StackTrace);
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            var user = await _repo.UserRepository.GetAsync(username, password);
+            if (user != null)
+                return StatusCode(StatusCodes.Status200OK, GenerateToken(user));//return token
+            return StatusCode(StatusCodes.Status204NoContent);
         }
     }
 }

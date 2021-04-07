@@ -1,95 +1,44 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using My.Data.Models;
 using My.Data.Repository;
-using System;
+using My.Data.Repository.Intefaces;
 using System.Threading.Tasks;
 
 namespace My.Server.Controllers
 {
-    [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
-    public class LoansController : ControllerBase
+    public class LoansController : BaseController
     {
-        private readonly ILogger _logger;
-        private readonly ILoanRepository _loan;
-        public LoansController(ILogger<LoansController> logger, MyDbRepository repository)
-        {
-            _logger = logger;
-            _loan = repository;
+        private readonly IMyDbRepository _repo;
+        public LoansController(MyDbRepository repository)
+        {         
+            _repo = repository;
         }
         [HttpGet()]
-        public async Task<IActionResult> GetLoansAsync([FromQuery] int accountId)
+        public async Task<IActionResult> GetAllAsync([FromQuery] int accountId,[FromQuery]int? take = null, [FromQuery]  int? skip = null)
         {
-            try
-            {
-                return StatusCode(StatusCodes.Status200OK, await _loan.GetLoansAsync(accountId));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                _logger.LogError(ex.StackTrace);
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return StatusCode(StatusCodes.Status200OK, await _repo.LoanRepository.GetAllAsync(accountId,take,skip));
         }
-        [HttpGet("loan")]
-        public async Task<IActionResult> GetLoanAsync([FromQuery] int id)
+        
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAsync(int id)
         {
-            try
-            {
-                return StatusCode(StatusCodes.Status200OK, await _loan.GetLoanAsync(id));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                _logger.LogError(ex.StackTrace);
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return StatusCode(StatusCodes.Status200OK, await _repo.LoanRepository.GetAsync(id));
         }
-        [HttpPost("add")]
-        public async Task<IActionResult> InsertLoanAsync([FromBody] Loan loan)
+        [HttpPost()]
+        public async Task<IActionResult> AddAsync([FromBody] Loan loan)
         {
-            try
-            {
-                return StatusCode(StatusCodes.Status200OK, await _loan.AddLoanAsync(loan));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                _logger.LogError(ex.StackTrace);
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return StatusCode(StatusCodes.Status200OK, await _repo.AddAsync(loan));
         }
-        [HttpPut("update")]
+        [HttpPut()]
         public async Task<IActionResult> UpdateLoanAsync([FromBody] Loan loan)
         {
-            try
-            {
-                return StatusCode(StatusCodes.Status200OK, await _loan.UpdateLoanAsync(loan));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                _logger.LogError(ex.StackTrace);
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return StatusCode(StatusCodes.Status200OK, await _repo.UpdateAsync(loan));
         }
-        [HttpDelete("delete")]
-        public async Task<IActionResult> DeleteLoanAsync([FromQuery] int id)
+        [HttpDelete()]
+        public async Task<IActionResult> DeleteLoanAsync([FromBody] Loan loan)
         {
-            try
-            {
-                return StatusCode(StatusCodes.Status200OK, await _loan.DeleteLoanAsync(id));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                _logger.LogError(ex.StackTrace);
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return StatusCode(StatusCodes.Status200OK, await _repo.DeleteAsync(loan));
         }
     }
 }

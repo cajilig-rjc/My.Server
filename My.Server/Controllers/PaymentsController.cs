@@ -1,95 +1,44 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using My.Data.Models;
 using My.Data.Repository;
-using System;
+using My.Data.Repository.Intefaces;
 using System.Threading.Tasks;
 
 namespace My.Server.Controllers
 {
-    [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
-    public class PaymentsController : ControllerBase
+    public class PaymentsController : BaseController
     {
-        private readonly ILogger _logger;
-        private readonly IPaymentRepository _payment;
-        public PaymentsController(ILogger<PaymentsController> logger, MyDbRepository repository)
+        private readonly IMyDbRepository _repo;
+        public PaymentsController(MyDbRepository repository)
         {
-            _logger = logger;
-            _payment = repository;
+            _repo = repository;
         }
         [HttpGet()]
-        public async Task<IActionResult> GetPaymentsAsync([FromQuery] int loanId)
+        public async Task<IActionResult> GetAllAsync([FromQuery] int paymentId, [FromQuery] int? take = null, [FromQuery] int? skip = null)
         {
-            try
-            {
-                return StatusCode(StatusCodes.Status200OK, await _payment.GetPaymentsAsync(loanId));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                _logger.LogError(ex.StackTrace);
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return StatusCode(StatusCodes.Status200OK, await _repo.PaymentRepository.GetAllAsync(paymentId, take, skip));
         }
-        [HttpGet("payment")]
-        public async Task<IActionResult> GetPaymentAsync([FromQuery] int id)
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAsync(int id)
         {
-            try
-            {
-                return StatusCode(StatusCodes.Status200OK, await _payment.GetPaymentAsync(id));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                _logger.LogError(ex.StackTrace);
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return StatusCode(StatusCodes.Status200OK, await _repo.PaymentRepository.GetAsync(id));
         }
-        [HttpPost("add")]
-        public async Task<IActionResult> InsertPaymentAsync([FromBody] Payment payment)
+        [HttpPost()]
+        public async Task<IActionResult> AddAsync([FromBody] Payment payment)
         {
-            try
-            {
-                return StatusCode(StatusCodes.Status200OK, await _payment.AddPaymentAsync(payment));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                _logger.LogError(ex.StackTrace);
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return StatusCode(StatusCodes.Status200OK, await _repo.AddAsync(payment));
         }
-        [HttpPut("update")]
+        [HttpPut()]
         public async Task<IActionResult> UpdatePaymentAsync([FromBody] Payment payment)
         {
-            try
-            {
-                return StatusCode(StatusCodes.Status200OK, await _payment.UpdatePaymentAsync(payment));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                _logger.LogError(ex.StackTrace);
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return StatusCode(StatusCodes.Status200OK, await _repo.UpdateAsync(payment));
         }
-        [HttpDelete("delete")]
-        public async Task<IActionResult> DeletePaymentAsync([FromQuery] int id)
+        [HttpDelete()]
+        public async Task<IActionResult> DeletePaymentAsync([FromBody] Payment payment)
         {
-            try
-            {
-                return StatusCode(StatusCodes.Status200OK, await _payment.DeletePaymentAsync(id));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                _logger.LogError(ex.StackTrace);
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return StatusCode(StatusCodes.Status200OK, await _repo.DeleteAsync(payment));
         }
     }
 }

@@ -8,7 +8,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using My.Data;
+using My.Data.Models;
 using My.Data.Repository;
+using My.Data.Repository.Intefaces;
+using My.Server.Middlewares;
 using System.Text;
 
 namespace My.Server
@@ -52,19 +55,20 @@ namespace My.Server
             services.AddDbContext<MyDbContext>(options => options
            .UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
             sqloptions => sqloptions.MigrationsAssembly("My.Server")));
-            services.AddScoped<MyDbRepository>();
+
+            services.AddScoped<IMyDbRepository, MyDbRepository>();
+
+            //Generic
+            services.AddScoped<MyDbGenericRepository<User>>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My.Server v1"));
-            }
-
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My.Server v1"));
+            
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseCors(x => x
@@ -72,6 +76,7 @@ namespace My.Server
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 );
+            app.UseMiddleware<ExceptionMiddleware>();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>

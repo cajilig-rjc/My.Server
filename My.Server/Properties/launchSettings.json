@@ -5,6 +5,10 @@
     "iis": {
       "applicationUrl": "http://localhost/My.Server",
       "sslPort": 0
+    },
+    "iisExpress": {
+      "applicationUrl": "http://localhost:60169/",
+      "sslPort": 0
     }
   },
   "profiles": {
@@ -15,6 +19,11 @@
     },
     "IIS": {
       "commandName": "IIS",
+      "launchBrowser": true,
+      "launchUrl": "swagger"
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
       "launchBrowser": true,
       "launchUrl": "swagger"
     }

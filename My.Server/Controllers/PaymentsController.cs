@@ -14,9 +14,9 @@ namespace My.Server.Controllers
             _repo = repository;
         }
         [HttpGet()]
-        public async Task<IActionResult> GetAllAsync([FromQuery] int paymentId, [FromQuery] int? take = null, [FromQuery] int? skip = null)
+        public async Task<IActionResult> GetAllAsync([FromQuery] int loanId, [FromQuery] int? take = null, [FromQuery] int? skip = null)
         {
-            return StatusCode(StatusCodes.Status200OK, await _repo.PaymentRepository.GetAllAsync(paymentId, take, skip));
+            return StatusCode(StatusCodes.Status200OK, await _repo.PaymentRepository.GetAllAsync(loanId, take, skip));
         }
 
         [HttpGet("{id}")]

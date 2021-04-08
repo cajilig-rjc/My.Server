@@ -16,7 +16,7 @@ namespace My.Data.Repository
 
         public IPaymentRepository PaymentRepository => new PaymentRepository(_context);
 
-        public IUserRepository UserRepository => throw new System.NotImplementedException();
+        public IUserRepository UserRepository => new UserRepository(_context);
 
         public async Task<int> AddAsync<T>(T entity)
         {

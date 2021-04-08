@@ -14,9 +14,9 @@ namespace My.Server.Controllers
             _repo = repository;
         }
         [HttpGet()]
-        public async Task<IActionResult> GetAllAsync([FromQuery] int loanId, [FromQuery] int? take = null, [FromQuery] int? skip = null)
+        public async Task<IActionResult> GetAllAsync([FromQuery] int paymentId, [FromQuery] int? take = null, [FromQuery] int? skip = null)
         {
-            return StatusCode(StatusCodes.Status200OK, await _repo.PaymentRepository.GetAllAsync(loanId, take, skip));
+            return StatusCode(StatusCodes.Status200OK, await _repo.PaymentRepository.GetAllAsync(paymentId, take, skip));
         }
 
         [HttpGet("{id}")]
@@ -27,17 +27,20 @@ namespace My.Server.Controllers
         [HttpPost()]
         public async Task<IActionResult> AddAsync([FromBody] Payment payment)
         {
-            return StatusCode(StatusCodes.Status200OK, await _repo.AddAsync(payment));
+            await _repo.AddAsync(payment);
+            return StatusCode(StatusCodes.Status200OK, await _repo.SaveChangesAsync());
         }
         [HttpPut()]
         public async Task<IActionResult> UpdatePaymentAsync([FromBody] Payment payment)
         {
-            return StatusCode(StatusCodes.Status200OK, await _repo.UpdateAsync(payment));
+            _repo.Update(payment);
+            return StatusCode(StatusCodes.Status200OK, await _repo.SaveChangesAsync());
         }
         [HttpDelete()]
         public async Task<IActionResult> DeletePaymentAsync([FromBody] Payment payment)
         {
-            return StatusCode(StatusCodes.Status200OK, await _repo.DeleteAsync(payment));
+            _repo.Delete(payment);
+            return StatusCode(StatusCodes.Status200OK, await _repo.SaveChangesAsync());
         }
     }
 }

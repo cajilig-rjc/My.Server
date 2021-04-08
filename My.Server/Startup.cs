@@ -56,10 +56,7 @@ namespace My.Server
            .UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
             sqloptions => sqloptions.MigrationsAssembly("My.Server")));
 
-            services.AddScoped<IMyDbRepository, MyDbRepository>();
-
-            //Generic
-            services.AddScoped<MyDbGenericRepository<User>>();
+            services.AddScoped<IMyDbRepository, MyDbRepository>();           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

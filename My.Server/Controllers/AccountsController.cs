@@ -25,19 +25,23 @@ namespace My.Server.Controllers
             return StatusCode(StatusCodes.Status200OK, await _repo.AccountRepository.GetAsync(id));
         }
         [HttpPost()]
+        [HttpPost()]
         public async Task<IActionResult> AddAsync([FromBody] Account account)
         {
-            return StatusCode(StatusCodes.Status200OK, await _repo.AddAsync(account));
+            await _repo.AddAsync(account);
+            return StatusCode(StatusCodes.Status200OK, await _repo.SaveChangesAsync());
         }
         [HttpPut()]
         public async Task<IActionResult> UpdateAccountAsync([FromBody] Account account)
         {
-            return StatusCode(StatusCodes.Status200OK, await _repo.UpdateAsync(account));
+            _repo.Update(account);
+            return StatusCode(StatusCodes.Status200OK, await _repo.SaveChangesAsync());
         }
         [HttpDelete()]
         public async Task<IActionResult> DeleteAccountAsync([FromBody] Account account)
         {
-            return StatusCode(StatusCodes.Status200OK, await _repo.DeleteAsync(account));
+            _repo.Delete(account);
+            return StatusCode(StatusCodes.Status200OK, await _repo.SaveChangesAsync());
         }
     }
 }

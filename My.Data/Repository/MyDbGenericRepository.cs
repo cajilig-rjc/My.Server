@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using My.Data.Repository.Intefaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace My.Data.Repository
 {
-    public class MyDbGenericRepository<T> where T: class
+    public class MyDbGenericRepository<T>:IGenericRepository<T> where T : class
     {
         private readonly MyDbContext _context;
         private readonly DbSet<T> _dbSet;
@@ -21,20 +22,22 @@ namespace My.Data.Repository
         {
             return await _dbSet.FindAsync(id);
         }
-        public async Task<int> AddAsync(T entity)
+        public async Task AddAsync(T entity)
         {
-            await _context.AddAsync(entity);
+            await _context.AddAsync(entity);           
+        }
+        public void Update(T entity)
+        {
+            _context.Update(entity);           
+        }
+        public void Delete(T entity)
+        {
+            _context.Remove(entity);           
+        }
+        public async Task<int> SaveChangesAsync()
+        {
             return await _context.SaveChangesAsync();
         }
-        public async Task<int> UpdateAsync(T entity)
-        {
-            _context.Update(entity);
-            return await _context.SaveChangesAsync();
-        }
-        public async Task<int> DeleteAsync(T entity)
-        {
-            _context.Remove(entity);
-            return await _context.SaveChangesAsync();
-        }
+      
     }
 }

@@ -27,17 +27,21 @@ namespace My.Server.Controllers
         [HttpPost()]
         public async Task<IActionResult> AddAsync([FromBody] Loan loan)
         {
-            return StatusCode(StatusCodes.Status200OK, await _repo.AddAsync(loan));
+            await _repo.AddAsync(loan);
+            return StatusCode(StatusCodes.Status200OK, await _repo.SaveChangesAsync());
         }
         [HttpPut()]
         public async Task<IActionResult> UpdateLoanAsync([FromBody] Loan loan)
         {
-            return StatusCode(StatusCodes.Status200OK, await _repo.UpdateAsync(loan));
+            _repo.Update(loan);
+            await _repo.AddAsync(loan);
+            return StatusCode(StatusCodes.Status200OK, await _repo.SaveChangesAsync());
         }
         [HttpDelete()]
         public async Task<IActionResult> DeleteLoanAsync([FromBody] Loan loan)
         {
-            return StatusCode(StatusCodes.Status200OK, await _repo.DeleteAsync(loan));
+            _repo.Delete(loan);
+            return StatusCode(StatusCodes.Status200OK, await _repo.SaveChangesAsync());
         }
     }
 }

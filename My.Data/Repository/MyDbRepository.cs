@@ -18,22 +18,25 @@ namespace My.Data.Repository
 
         public IUserRepository UserRepository => new UserRepository(_context);
 
-        public async Task<int> AddAsync<T>(T entity)
+        public async Task AddAsync<T>(T entity)
         {
-           await _context.AddAsync(entity);
-            return await _context.SaveChangesAsync();
+           await _context.AddAsync(entity);           
         }
 
-        public async Task<int> DeleteAsync<T>(T entity)
+        public void Delete<T>(T entity)
         {
             _context.Remove(entity);
+          
+        }
+
+        public async Task<int> SaveChangesAsync()
+        {
             return await _context.SaveChangesAsync();
         }
 
-        public async Task<int> UpdateAsync<T>(T entity)
+        public void Update<T>(T entity)
         {
-            _context.Update(entity);
-            return await _context.SaveChangesAsync();
+            _context.Update(entity);          
            
         }
     }
